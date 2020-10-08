@@ -1,0 +1,44 @@
+# To get started with security, check out the documentation:
+# https://symfony.com/doc/current/security.html
+security:
+    encoders:
+         SeguridadBundle\Entity\Usuario: bcrypt
+    # https://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    providers:
+        #our_users:
+            #entity: { class: SeguridadBundle\Entity\Usuario, property: nombre_usuario }
+        our_users:
+            id: our_user_provider
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        oauth_token:                                   # Todos pueden acceder a la URL del token de acceso.
+            pattern: ^/oauth/v2/token
+            security: false
+
+        oauth_token:                                   # Todos pueden acceder a la URL del token de acceso.
+            pattern: ^/oauth/v2/auth
+            security: false
+
+        api:
+            pattern: ^/api/doc/oauth                             # Todas las URL están protegidas
+            fos_oauth: true                             # OAuth2 protege recursos
+            stateless: true
+            anonymous: false                            # El acceso anónimo no está permitido
+
+        main:
+            pattern:    ^/
+                    #http_basic: ~
+
+            anonymous: ~
+            # activate different ways to authenticate
+
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+            #http_basic: ~
+
+            # https://symfony.com/doc/current/security/form_login_setup.html
+            #form_login: ~

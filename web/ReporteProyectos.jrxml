@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteDenuncias" language="groovy" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4360d338-a950-4ea3-b16f-6b864b998060">
+	<property name="ireport.zoom" value="1.2100000000000042"/>
+	<property name="ireport.x" value="179"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1" uuid="8472d9de-c091-4983-a54c-5dd752c46277"/>
+	<parameter name="fec_ini" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fec_fin" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+      CASE WHEN z.departamento='LPZ'THEN 'LA PAZ'
+     WHEN z.departamento='CBB'THEN 'COCHABAMBA'
+     WHEN z.departamento='SCZ'THEN 'SANTA CRUZ'
+     WHEN z.departamento='BEN'THEN 'BENI'
+     WHEN z.departamento='TJA'THEN 'TARIJA'
+     WHEN z.departamento='SUC'THEN 'CHUQUISACA'
+     WHEN z.departamento='ORU'THEN 'ORURO'
+     WHEN z.departamento='PTS'THEN 'POTOSI'
+     ELSE 'PANDO'END dpto,
+      ROW_NUMBER() OVER(ORDER BY z.departamento,y.descripcion asc) AS Row,
+     x.id,
+     x.usuario_registro,
+     x.fecha_registro,
+     x.nombre_proyecto,
+     i.nombre,
+     z.departamento,
+     y.descripcion,
+     count(*) as total,
+     x.id AS x_id_usuario,
+     y.descripcion AS z_descripcion
+FROM
+     plataforma.proyecto x INNER JOIN plataforma.municipio y ON x.municipio = y.id
+     INNER JOIN seguridad.entidad i ON x.institucion = i.id
+     INNER JOIN plataforma.provincia z ON x.provincia = z.id
+WHERE x.fecha_registro >= $P{fec_ini}
+AND x.fecha_registro <= $P{fec_fin}
+group by
+	z.departamento,
+	x.id,
+	x.usuario_registro,
+	y.descripcion,
+	i.nombre,
+	z.descripcion
+order by z.departamento,y.descripcion]]>
+	</queryString>
+	<field name="dpto" class="java.lang.String"/>
+	<field name="row" class="java.lang.Long"/>
+	<field name="id" class="java.lang.Integer"/>
+	<field name="usuario_registro" class="java.lang.String"/>
+	<field name="fecha_registro" class="java.sql.Date"/>
+	<field name="nombre_proyecto" class="java.lang.String"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="departamento" class="java.lang.String"/>
+	<field name="descripcion" class="java.lang.String"/>
+	<field name="total" class="java.lang.Long"/>
+	<field name="x_id_usuario" class="java.lang.Integer"/>
+	<field name="z_descripcion" class="java.lang.String"/>
+	<variable name="sDpto" class="java.lang.Long" resetType="Group" resetGroup="gDepart" calculation="Count">
+		<variableExpression><![CDATA[$F{dpto}]]></variableExpression>
+	</variable>
+	<variable name="sMuni" class="java.lang.Long" resetType="Group" resetGroup="gMuni" calculation="Count">
+		<variableExpression><![CDATA[$F{z_descripcion}]]></variableExpression>
+	</variable>
+	<group name="gDepart">
+		<groupExpression><![CDATA[$F{dpto}]]></groupExpression>
+		<groupHeader>
+			<band height="24">
+				<staticText>
+					<reportElement x="0" y="3" width="100" height="20" uuid="5cc7c67e-a7b3-40f6-bd1a-84a3a593f836"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<text><![CDATA[DEPARTAMENTO]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="19" width="166" height="1" uuid="8e0ecd41-3c71-4c26-b2cc-460204908c07"/>
+				</line>
+				<textField>
+					<reportElement x="92" y="3" width="93" height="17" uuid="cc5b44d3-23d8-4e6b-9a95-82c46bd17dec"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{dpto}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="26">
+				<textField>
+					<reportElement x="549" y="4" width="42" height="20" uuid="8239a7fc-a4ac-499e-8976-3e1de416099d"/>
+					<textElement>
+						<font size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sDpto}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="439" y="6" width="126" height="17" uuid="1a783d9a-016c-45b0-9a03-11527d5a6a7b"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[TOTAL DEPARTAMENTO]]></text>
+				</staticText>
+				<line>
+					<reportElement x="440" y="3" width="129" height="1" uuid="10f3cca1-a617-4fc7-a9d6-b5573cf30526"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="gMuni">
+		<groupExpression><![CDATA[$F{z_descripcion}]]></groupExpression>
+		<groupHeader>
+			<band height="15">
+				<textField>
+					<reportElement x="92" y="0" width="121" height="14" uuid="18ac2c4d-e8ec-40ef-9a81-2aacfa884fae"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="17" y="0" width="100" height="15" uuid="dba1b5e5-697f-45e3-8396-9e7af970324d"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[PROVINCIA]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="16">
+				<textField>
+					<reportElement x="549" y="5" width="48" height="11" uuid="787581ed-701e-4d35-9f99-225cab790c5e"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sMuni}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="441" y="2" width="128" height="1" uuid="9ced5c23-b0af-442c-ac8e-e62b4528f813"/>
+				</line>
+				<staticText>
+					<reportElement x="470" y="5" width="102" height="11" uuid="7045b6e2-a0ee-446a-b757-ef782b7d662f"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[TOTAL MUNICIPIO]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="86" splitType="Stretch">
+			<staticText>
+				<reportElement x="203" y="42" width="193" height="21" uuid="2ccc5773-94dc-4dbd-91a2-09b34998ada6"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[LISTADO DE PROYECTOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="186" y="22" width="204" height="20" uuid="e9173918-fb59-4a4a-9211-dad3d67687fd"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[SISTEMA MI PLATAFORMA]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="238" y="66" width="70" height="20" uuid="ba60d9df-aac2-4a72-989e-bcce8904c071"/>
+				<textFieldExpression><![CDATA[$P{fec_ini}.format("dd/MM/yyyy")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="335" y="66" width="69" height="20" uuid="90f7e26c-2237-44d7-925e-10f59dec37cc"/>
+				<textFieldExpression><![CDATA[$P{fec_fin}.format("dd/MM/yyyy")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="204" y="66" width="35" height="20" uuid="49ec04a7-3b0e-41a0-9713-1d59ea8ddc25"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Del]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="66" width="45" height="20" uuid="868c1dc6-5406-4822-b6cf-3c368351d900"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Al]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="572" height="20" uuid="a719e9ac-c2d6-48a9-ae1e-14fa459c0c1d"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="9" y="1" width="36" height="19" uuid="ab5f520c-28b9-47ae-8c5b-0752bcd2b4f0"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Nro ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="1" width="56" height="19" uuid="e1106cc2-db41-40ba-b62e-542a8c7327cc"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Usuario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="264" y="1" width="62" height="19" uuid="3e90383d-7b24-4ab8-9c4b-034c37472836"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Municipio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="362" y="1" width="83" height="19" uuid="96588f21-1987-4e06-88ea-b6203ea44b3e"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Fecha Registro]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="1" width="83" height="19" uuid="38ed9b39-c669-4815-8818-3b429c7e8ca8"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[Institución]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="91" y="1" width="100" height="18" uuid="eeadabfb-b7cb-4180-a1d9-aad41da5493f"/>
+				<text><![CDATA[Nombre Proyecto]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="46" y="1" width="64" height="20" uuid="2bbc31d9-744d-4e25-9150-409d87852395"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{usuario_registro}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="265" y="1" width="96" height="20" uuid="0fab412a-9198-4feb-890f-7e12fc8ea014"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{z_descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="364" y="0" width="52" height="20" uuid="dcd8da96-f7de-435b-804b-398ba8a6f4d6"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fecha_registro}.format("dd/MM/yyyy")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="439" y="2" width="124" height="18" uuid="429750e8-82cb-47e1-8171-a8610c1c39b9"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="12" y="1" width="71" height="20" uuid="c258c24c-3672-46b9-ae15-b0d7c0eb79cd"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{row}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="92" y="2" width="162" height="18" uuid="f682dd47-48b3-4931-8aa3-fb4efb425a20"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_proyecto}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="18" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="0" width="569" height="1" uuid="26703b11-8c89-4a38-9559-bc9dc749f255"/>
+			</line>
+			<textField>
+				<reportElement x="538" y="6" width="100" height="20" uuid="fc50408d-19d7-443b-b866-ab0c8ab028c1"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="497" y="6" width="100" height="20" uuid="99c2337a-97b8-4008-a9ec-a15dc43312a1"/>
+				<text><![CDATA[Página]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="6" width="110" height="20" uuid="7884ddc7-a5da-4aef-bbac-1d78275b6c61"/>
+				<text><![CDATA[Fecha de Impresión]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="99" y="6" width="100" height="20" uuid="bc1183a4-cfee-474f-850b-0a9fb0ca38e1"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="166" y="25" width="340" height="20" uuid="e53da6de-3113-4c98-be5a-89bcee7a9fc5"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Av. 16 de Julio, Nº 1769 - Central Piloto:   La Paz - Bolivia]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
